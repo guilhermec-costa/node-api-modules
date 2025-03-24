@@ -33,8 +33,13 @@ async function OSAPi() {
   require("./os-api.js");
 }
 
+async function eventsAPI() {
+  require("./events-api.js");
+}
+
 (async function () {
   // await fsApi();
   // await netApi();
-  await OSAPi();
+  // await OSAPi();
+  await eventsAPI();
 })();
