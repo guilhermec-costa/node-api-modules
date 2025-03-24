@@ -27,17 +27,30 @@ const tcpServer = net.createServer(
   {
     blockList: ipsBlocklist,
   },
-  (conn) => {
-    console.log("client connected through socket", conn.address());
-    conn.on("data", (v) => {
+  (socket) => {
+    console.log("client connected through socket", socket.address());
+    socket.on("data", (v) => {
       console.log("Received from the client: ", v.toString());
-      const res = procReq(v);
-      conn.write(res);
-      conn.end();
+      // const res = procReq(v);
+      console.log("Bytes written: ", socket.bytesWritten);
+      socket.write("from server");
+      // socket.end();
     });
 
-    conn.on("end", () => {
-      console.log("Connection closed");
+    socket.on("ready", () => {
+      console.log("Socket is ready");
+    });
+
+    setTimeout(() => {
+      socket.end();
+    }, 5000);
+    socket.on("end", () => {
+      console.log("connection ended");
+    });
+
+    socket.on("close", () => {
+      console.log("connection closed");
+      console.log("Is socket on server closed: ", socket.closed);
     });
   }
 );
@@ -47,7 +60,14 @@ tcpServer.listen(8085, () => {
 });
 
 tcpServer.on("connection", () => {
-  tcpServer.getConnections((e, c) => {
-    console.log(c);
+  tcpServer.getConnections((err, count) => {
+    console.log("count: ", count);
   });
+});
+
+const socket = new net.Socket();
+socket.connect(8085, "localhost");
+
+socket.on("end", () => {
+  console.log("client socket has ended");
 });
